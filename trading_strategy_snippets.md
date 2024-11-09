@@ -2,7 +2,7 @@
 
 This guide provides reusable code snippets for different trading strategies, organized by type. Each snippet includes the strategy logic, explanation, and example code.
 
-Several ideas from rbollar's code here:
+Several igit deas from rbollar's code here:
 https://github.com/rbollar/powston_script/blob/main/script.py
 
 ## 1. Price-Based Trading Strategies
