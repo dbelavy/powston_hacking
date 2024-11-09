@@ -18,7 +18,7 @@ POWSTON is an advanced energy management system that combines smart hardware dev
 - Custom control scripts support
 - Dynamic pricing optimization
 
-## Available Variables
+## System Variables
 
 ### Time & Location Variables
 | Variable | Type | Example | Description |
@@ -28,8 +28,6 @@ POWSTON is an advanced energy management system that combines smart hardware dev
 | location | LocationInfo | - | Contains name, region, timezone, latitude, longitude |
 | sunrise | datetime | - | Daily sunrise time |
 | sunset | datetime | - | Daily sunset time |
-| current_hour | integer | 16 | obtain from current_hour = interval_time.hour (24-hour format) |
-| t_o_day | string | "peak" | Time period ("peak", "daytime", "nighttime") |
 
 ### Power Measurements
 | Variable | Type | Example | Description |
@@ -72,7 +70,6 @@ POWSTON is an advanced energy management system that combines smart hardware dev
 | sell_price | float | 8.4 | Current sell price |
 | buy_forecast | list | - | Future buy prices (8 hours) |
 | sell_forecast | list | - | Future sell prices (8 hours) |
-| avg_future_buy | float | 40.1 | Average future buy price |
 | feed_in_tariff | float | 8.4 | Feed-in tariff rate |
 
 ### Grid Metrics
@@ -92,7 +89,7 @@ POWSTON is an advanced energy management system that combines smart hardware dev
 | solar_voltage_2 | float | 0.0 | Solar panel voltage (String 2) |
 | solar_current_2 | float | 0.0 | Solar panel current (String 2) |
 
-## Control Parameters
+## Control System
 
 ### System Actions
 The system supports the following control actions:
@@ -103,8 +100,7 @@ The system supports the following control actions:
 - **export**: Export to grid at full power from battery and solar
 - **stopped**: Pause battery operations, use grid for demand
 
-### Solar Control
-Solar generation can be controlled with two modes:
+### Solar Control Modes
 - **export**: Operate at maximum capacity with grid export
 - **curtail**: Limit generation to match household demand
 
@@ -117,19 +113,16 @@ Solar generation can be controlled with two modes:
 | export_power_limitation | integer | Maximum export power |
 | export_power_limitation_enable | integer | Export limitation control |
 
-## Advanced Trading Strategies
+## Trading Strategies
 
-### Time-Based Trading
+### Time-Based Strategy
 ```python
-# Define time periods for optimal trading
+# Define time periods
 sunrise_hour = sunrise.hour + 1
 peak_start = 16
 peak_end = 21
 
-# Calculate average future buy price (next 2 hours)
-avg_future_buy = sum(buy_forecast[0:4]) / len(buy_forecast[0:4])
-
-# Time-of-day based strategy
+# Time-of-day based control
 if sunrise_hour <= current_hour < peak_start:
     t_o_day = 'daytime'
     action = "charge"  # Charge during daytime for peak usage
@@ -143,38 +136,37 @@ else:
 
 ### Price Arbitrage Strategy
 ```python
-# Constants for price-based decisions
+# Constants
 PRICE_RATIO_THRESHOLD = 1.5  # Minimum ratio for profitable trading
 MIN_SOC = 20                 # Minimum battery charge to maintain
 HIGH_SOC = 80               # Target for charging before peak
 
-# Negative price opportunity
+# Calculate average future buy price
+avg_future_buy = sum(buy_forecast[0:4]) / len(buy_forecast[0:4]) if buy_forecast else None
+
+# Trading logic
 if buy_price < 0:
     action = 'import'
     decision_reason = "Importing due to negative price"
-
-# Price arbitrage opportunity
 elif sell_price > (avg_future_buy * PRICE_RATIO_THRESHOLD) and battery_soc > MIN_SOC:
     action = 'export'
     decision_reason = f"Price arbitrage (Sell: {sell_price}, Avg future buy: {avg_future_buy})"
-
-# Pre-peak charging strategy
 elif (CHARGE_HOUR_START <= current_hour < CHARGE_HOUR_END) and battery_soc < HIGH_SOC:
     action = 'import'
     decision_reason = f"Scheduled charging before peak"
 ```
 
-### Multi-Inverter Trading Strategy
+### Multi-Inverter Strategy
 ```python
-# Get data from primary inverter
-house_power = inverters['inverter_params_1839']['house_power']  # positive is consumption
+# Get inverter data
+house_power = inverters['inverter_params_1839']['house_power']
 battery_soc = inverters['inverter_params_1839']['battery_soc']
-grid_balance = inverters['inverter_params_1839']['grid_power']  # positive is drawing from grid
+grid_balance = inverters['inverter_params_1839']['grid_power']
 
-# Calculate house consumption in kW for curtailment decisions
+# Calculate house consumption in kW
 house_kW = int(abs(house_power) // 1000) + 1
 
-# Advanced solar control based on multiple conditions
+# Solar control logic
 if buy_price < 0:
     action = 'curtail100-curtail'  # Full curtailment during negative prices
 elif sell_price > 0:
@@ -182,14 +174,15 @@ elif sell_price > 0:
 elif battery_soc <= 95:
     action = 'export-export'       # Fill battery when not full
 elif battery_soc > 95 and sell_price < 0:
-    # Dynamic curtailment based on house consumption
     if house_kW > 9:
         action = 'export-export'   # High consumption needs full power
     else:
-        # Curtail to match house consumption
         curtail_level = max(1, min(9, house_kW))
         action = f'curtail{curtail_level}000-curtail'
 ```
+
+
+
 
 ### Trading Strategy Best Practices
 1. **Price Monitoring**
@@ -230,13 +223,6 @@ CHARGE_HOUR_START = 13
 CHARGE_HOUR_END = 15
 PRICE_RATIO_THRESHOLD = 1.5
 
-# Time-based control
-if sunrise_hour <= current_hour < peak_start:
-    action = "charge"
-elif peak_start <= current_hour < peak_end:
-    action = "auto"
-else:
-    action = "auto"
 
 # Price-based decisions
 if buy_price < 0:
@@ -266,6 +252,7 @@ else:
 4. Monitor battery temperature and health
 5. Balance between self-consumption and grid export
 6. Use forecasting data for predictive control
+
 
 
 
