@@ -28,7 +28,7 @@ POWSTON is an advanced energy management system that combines smart hardware dev
 | location | LocationInfo | - | Contains name, region, timezone, latitude, longitude |
 | sunrise | datetime | - | Daily sunrise time |
 | sunset | datetime | - | Daily sunset time |
-| current_hour | integer | 16 | Current hour (24-hour format) |
+| current_hour | integer | 16 | obtain from current_hour = interval_time.hour (24-hour format) |
 | t_o_day | string | "peak" | Time period ("peak", "daytime", "nighttime") |
 
 ### Power Measurements

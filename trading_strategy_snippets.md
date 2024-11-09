@@ -2,6 +2,9 @@
 
 This guide provides reusable code snippets for different trading strategies, organized by type. Each snippet includes the strategy logic, explanation, and example code.
 
+Several ideas from rbollar's code here:
+https://github.com/rbollar/powston_script/blob/main/script.py
+
 ## 1. Price-Based Trading Strategies
 
 ### High Price Export Strategy
@@ -112,6 +115,8 @@ if (buy_price < max_buy_price and
 **Logic**: Use discounted forecasts to make optimal trading decisions while accounting for uncertainty.
 
 ### Load Forecast Integration
+
+
 ```python
 # Strategy: Consider minimum house power usage forecast
 min_house_power = [

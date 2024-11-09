@@ -20,6 +20,8 @@ old_files/
 *.egg-info/
 .installed.cfg
 *.egg
+temp/
+
 
 # Virtual Environment
 venv/
