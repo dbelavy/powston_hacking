@@ -26,7 +26,7 @@ For a complete list of available system variables and their descriptions, please
 ### System Actions
 The system supports the following control actions:
 - **auto**: Maintain zero grid balance, charging/discharging to meet demand
-- **charge**: Charge battery solar power excess after meeting house demand
+- **charge**: Charge battery only from solar power excess after meeting house demand
 - **discharge**: Use battery for household demand without grid export
 - **import**: Import from grid at full power for household and battery
 - **export**: Export to grid at full power from battery and solar
