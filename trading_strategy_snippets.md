@@ -168,6 +168,41 @@ if daytime:
 ```
 **Logic**: Balance between immediate export and battery charging during solar generation periods.
 
+
+
+# Moving average calculation
+
+
+Calculating a moving average allows you to look back and determine if prices are spiking compared to where they've been.
+
+```
+# Build moving average
+prices = history_buy_prices
+
+# Simple Moving Average (SMA) for different periods
+def calculate_sma(data, period):
+    results = []
+    for i in range(len(data) - period + 1):
+        window = data[i:i + period]
+        average = sum(window) / period
+        results.append(average)
+    return results
+
+# Calculate different SMAs
+sma_1hr = calculate_sma(prices, 12)    # 12 x 5min moving average
+# sma_2hr = calculate_sma(prices, 24)  # 24 x 5min  moving average
+# sma_4hr = calculate_sma(prices, 48)  # 48 x 5 min moving average
+
+# Print most recent SMAs
+reason += (f" Most recent 1hr SMA: {sma_1hr[-1]:.2f}")
+# reason += (f" Most recent 2hr SMA: {sma_2hr[-1]:.2f}")
+# reason += (f" Most recent 4hr SMA: {sma_4hr[-1]:.2f}")
+```
+
+
+
+
+
 ## Best Practices for Strategy Implementation
 
 1. **Combine Strategies Carefully**
