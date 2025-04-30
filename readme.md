@@ -91,9 +91,9 @@ elif (CHARGE_HOUR_START <= current_hour < CHARGE_HOUR_END) and battery_soc < HIG
 ### Multi-Inverter Strategy
 ```python
 # Get inverter data
-house_power = inverters['inverter_params_1839']['house_power']
-battery_soc = inverters['inverter_params_1839']['battery_soc']
-grid_balance = inverters['inverter_params_1839']['grid_power']
+house_power = inverters.get('inverter_params_1839', {}).get('house_power',0)
+battery_soc = inverters.get('inverter_params_1839', {}).get('battery_soc',0)
+grid_balance = inverters.get('inverter_params_1839', {}).get('grid_power',0)
 
 # Calculate house consumption in kW
 house_kW = int(abs(house_power) // 1000) + 1
