@@ -723,6 +723,21 @@ except Exception as e:
 # created: soc_reserve (not for later use)
 # added variable "surplus_energy"
 
+#validate weather data
+try:
+    if weather_data:
+        CLOUD_COVER = weather_data.get('hourly', {}).get('cloud_cover', [-1] * 24)
+        GTI_TODAY = sum(weather_data.get('hourly', {}).get('global_tilted_irradiance_instant', [-1] * 24))
+        GTI_INSTANT = (weather_data.get('hourly', {}).get('global_tilted_irradiance_instant', [-1] * 24))
+    if GTI_TODAY > 0:
+        reason += f" GTI today: {GTI_TODAY}. Remaining: {sum(GTI_INSTANT[hour:])}. Instant {GTI_INSTANT[hour]}. Cloud cover: {CLOUD_COVER[hour]}."
+    else:
+        reason += f" Global_tilted_irradiance is not valid."
+except:
+    reason += f" Error getting global tilted irradiance."
+
+
+
 # flake8: noqa
 
 
