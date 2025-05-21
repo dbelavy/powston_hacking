@@ -88,6 +88,37 @@ elif (CHARGE_HOUR_START <= current_hour < CHARGE_HOUR_END) and battery_soc < HIG
     decision_reason = f"Scheduled charging before peak"
 ```
 
+
+### Solar Forecast Strategy
+Use solar irradiance forecasts to estimate battery SOC and decide whether to import
+```python
+IMPORT_TOLERANCE = 50  # Acceptable % margin over the lowest forecasted buy price
+MIN_SOC_AT_PEAK = 70  # Target SOC (%) by 4 PM
+
+# Accumulate past and expected solar irradiance until 4 PM
+global_tilted_irradiance_past = sum(
+    weather_data.get('hourly', {}).get('global_tilted_irradiance_instant', [-1]*24)[:interval_time.hour]
+)
+global_tilted_irradiance_to_2pm = sum(
+    weather_data.get('hourly', {}).get('global_tilted_irradiance_instant', [-1]*24)[:16]
+)
+
+# Only apply this logic before 4 PM
+if 4 < interval_time.hour < 16 and buy_forecast:
+    low_buy_price = round(min(buy_forecast), 2)
+    precent_pv_past = round(global_tilted_irradiance_past / global_tilted_irradiance_to_2pm * MIN_SOC_AT_PEAK, 2)
+    
+    reason += f" Solar Forecast Strategy: Expected SOC from PV by 4 PM ~{precent_pv_past}%."
+
+    tolerant_low_price = round(low_buy_price * ((100 + IMPORT_TOLERANCE) / 100), 2)
+
+    if action in ['auto', 'charge'] and battery_soc < precent_pv_past and buy_price < tolerant_low_price:
+        action = 'import'
+        reason += f" Buy price {buy_price}c is lower than {tolerant_low_price}c. Importing to meet target SOC."
+    else:
+        reason += f" Holding current action: {action}. Waiting as import price {buy_price}c > {tolerant_low_price}c."
+```
+
 ### Multi-Inverter Strategy
 ```python
 # Get inverter data
