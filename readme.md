@@ -119,6 +119,28 @@ if 4 < interval_time.hour < 16 and buy_forecast:
         reason += f" Holding current action: {action}. Waiting as import price {buy_price}c > {tolerant_low_price}c."
 ```
 
+### Strategy: Always Export RRP (Inverter-Level Override)
+
+This rule **forces the inverter to export at full power without running the full rules engine**, based on the raw wholesale **RRP (Regional Reference Price)** from AEMO.
+
+```python
+always_export_rrp = 1000  # Example threshold: $1/kWh (1000 $/MWh)
+if battery_soc < 30:
+    always_export_rrp = 10000  # Raise threshold to $10/kWh when battery is low
+    reason += f" Increasing always_export_rrp due to low SOC: {always_export_rrp} $/MWh."
+```
+
+**Logic**:
+When `always_export_rrp` is set, the inverter receives a direct command to export at full capacity **without evaluating any other strategies**. This is ideal for price spikes where quick action matters.
+
+To avoid needing to buy back later at high prices, the threshold should increase when battery state of charge (SOC) is low (e.g. below 30%). No point selling at $1 and buying back $10.
+
+**Notes**:
+
+* `always_export_rrp` is interpreted **in \$/MWh**, so `1000` means 100c/kWh or \$1/kWh.
+* RRP is **not adjusted** for local tariffs, losses, or fees.
+* We use RRP because it **leads retail prices and forecasts** by a few seconds, letting the inverter start exporting right at the start of a price spike.
+
 ### Multi-Inverter Strategy
 ```python
 # Get inverter data
