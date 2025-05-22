@@ -119,6 +119,11 @@ if 4 < interval_time.hour < 16 and buy_forecast:
         reason += f" Holding current action: {action}. Waiting as import price {buy_price}c > {tolerant_low_price}c."
 ```
 
+If you want to check tomorrow's PV, you can look ahead a day:
+```
+tomorrow_morning_hours_away = 24 - interval_time.hour
+global_tilted_irradiance_tomorrow = sum(weather_data.get('hourly', {}).get('global_tilted_irradiance_instant', [-1] * 24)[tomorrow_morning_hours_away:])
+```
 ### Strategy: Always Export RRP (Inverter-Level Override)
 
 This rule **forces the inverter to export at full power without running the full rules engine**, based on the raw wholesale **RRP (Regional Reference Price)** from AEMO.
