@@ -272,6 +272,11 @@ else:
     curtail_level = max(1, min(9, house_kW))
     action = f'curtail{curtail_level}000-curtail'
 ```
+### Powston MQTT Integration
+
+Powston supports importing data from **Home Assistant MQTT feeds** using the `mqtt_data` dictionary structure.
+
+See [powston_mqtt_integration.md](./powston_mqtt_integration.md) for details.
 
 ## Best Practices
 1. Always maintain minimum battery SOC (State of Charge)
