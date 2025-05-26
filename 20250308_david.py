@@ -490,6 +490,8 @@ try:
             reason += f" {name} is not a valid number. "
 except NameError as e:
     reason += f"A threshold variable is not defined: {e}"
+except:
+    reason += " Error validating thresholds. "
 
 # validate thresholds
 
