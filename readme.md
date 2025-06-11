@@ -130,15 +130,21 @@ This rule **forces the inverter to export at full power without running the full
 
 ```python
 always_export_rrp = 1000  # Example threshold: $1/kWh (1000 $/MWh)
-if battery_soc < 30:
+if battery_soc < 10:
+    always_export_rrp = None  # This is Optional and can be unset with None
+    reason += " stop always_export_rrp"
+elif battery_soc < 30:
     always_export_rrp = 10000  # Raise threshold to $10/kWh when battery is low
     reason += f" Increasing always_export_rrp due to low SOC: {always_export_rrp} $/MWh."
+always_export_rrp = 1000
 ```
 
 **Logic**:
 When `always_export_rrp` is set, the inverter receives a direct command to export at full capacity **without evaluating any other strategies**. This is ideal for price spikes where quick action matters.
 
 To avoid needing to buy back later at high prices, the threshold should increase when battery state of charge (SOC) is low (e.g. below 30%). No point selling at $1 and buying back $10.
+
+For nights with sustained high prices, you can unset this at a given SOC by setting it to None and let the code run in auto to avoid having to buy energy back at potentially higher rates.
 
 **Notes**:
 
