@@ -177,6 +177,22 @@ elif battery_soc > 95 and sell_price < 0:
         action = f'curtail{curtail_level}000-curtail'
 ```
 
+### Amber Support
+If you're using Amber and want to pull in their prices, you can—provided your Amber API key is saved in your site settings.
+
+To access the most recent cached Amber prices (which typically update after the NEM price), you can use the following logic. Be aware that due to the slight delay in Amber publishing their data, prices may only align with the second run of a two-minute loop.
+
+```python
+amber_sell_price = site_statistics.get("amber_sell_price", sell_price)
+amber_buy_price = site_statistics.get("amber_buy_price", buy_price)
+reason = f'vic amber sell: {amber_sell_price} buy {amber_buy_price}:'
+if site_statistics.get("amber_nem_time"):
+    if interval_time != site_statistics.get("amber_nem_time"):
+        reason = f'vic amber price old: {site_statistics.get("amber_nem_time")}'
+        amber_sell_price = sell_price
+        amber_buy_price = buy_price
+```
+
 ### Trading Strategy Best Practices
 1. **Price Monitoring**
    - Track real-time prices and forecasts
