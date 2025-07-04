@@ -18,6 +18,48 @@ POWSTON is an advanced energy management system that combines smart hardware dev
 - Custom control scripts support
 - Dynamic pricing optimization
 
+## Powston Python Environment Overview
+
+### ✅ Supported Features
+
+- **Python-like syntax**: Powston scripts use standard Python 3 syntax in a restricted execution environment.
+- **Basic data types**: Supports `int`, `float`, `str`, `bool`, `list`, and `dict`.
+- **Arithmetic and logic**: Standard operations like `+`, `-`, `*`, `/`, `if`, `elif`, `else`, `and`, `or`, `not` are available.
+- **Function definitions**: You can define helper functions (e.g., `update_reason(...)`) if they appear early in the script.
+- **Datetime variables**: Built-in support for `local_time`, `interval_time`, `sunrise`, and `sunset`, which behave like datetime objects.
+- **Forecast inputs**: Arrays like `buy_forecast` and `sell_forecast` are available for pricing logic.
+
+---
+
+### ⚠️ Limitations & Constraints
+
+| Feature | Behavior |
+|--------|----------|
+| `return` statements | **Not supported** for script control flow. Use `if` logic or global flags instead. |
+| `import` statements | **Not allowed**. No external libraries or modules can be used. |
+| Class definitions | Not supported — object-oriented programming is disabled. |
+| Undefined function use | Functions must be defined **before use**. There’s no forward resolution. |
+| Short-circuit variables | Variables like `always_export_rrp` are **checked by Powston before any rules are executed**. They override the script and bypass other logic. |
+| Error handling | Script errors (e.g., `NoneType` division, `NameError`) are reported without line numbers. |
+| Division safety | Division by zero or `None` causes hard script failure. Always check the denominator or use safe patterns. |
+
+---
+
+### 🧠 Best Practices
+
+- **Define helper functions early** to ensure scope visibility throughout the script.
+- **Use safe type checks** like `isinstance(x, (int, float))` to avoid `NoneType` errors.
+- **Inline division protections**: e.g. `x / y if y else 0.1` for default fallback behavior.
+- **Avoid relying on standard Python scoping**: Think linearly; Powston does not behave like a normal interpreter.
+- **Comment aggressively**: Explain business logic decisions, thresholds, and overrides for future maintainability.
+- **Structure clearly**:
+  - Start with constants
+  - Import and sanitize MQTT/API data
+  - Define utility functions
+  - Apply rules in readable, prioritized blocks
+
+---
+
 ## System Variables
 For a complete list of available system variables and their descriptions, please see [available_variables.md](available_variables.md).
 
@@ -248,6 +290,11 @@ else:
     curtail_level = max(1, min(9, house_kW))
     action = f'curtail{curtail_level}000-curtail'
 ```
+### Powston MQTT Integration
+
+Powston supports importing data from **Home Assistant MQTT feeds** using the `mqtt_data` dictionary structure.
+
+See [powston_mqtt_integration.md](./powston_mqtt_integration.md) for details.
 
 ## Best Practices
 1. Always maintain minimum battery SOC (State of Charge)
