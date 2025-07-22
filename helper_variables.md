@@ -29,7 +29,5 @@ These variables are in the rule engine, allowing for smarter decisions. Each is 
 | `soc_surplus`          | SOC (%) minus `night_reserve`. Positive = excess energy.                |
 | `time_left`            | Hours remaining to charge/discharge (until sunset or sunrise).          |
 | `projected_deficit`    | Forecasted SOC shortfall by sunrise, if discharging continues.          |
-| `action`               | Suggested mode: `'auto'` or `'export'` if RRP > 990.                    |
-| `reason`               | Diagnostic string explaining action logic.                              |
 
 ---
