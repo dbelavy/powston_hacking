@@ -15,7 +15,7 @@ action = decisions.reason(new_action, reason_text)
 | `new_action` | string | required | The action you want to take (e.g. 'auto', 'charge', 'import', 'export') |
 | `reason_text` | string | required | Text describing why this decision was made |
 | `priority` | integer | 2 | Priority level (1-5+). Higher priorities cannot be overridden |
-| `values` | dict | None | Key values that influenced this decision for debugging |
+| `kwargs` | any | None | Key values that influenced this decision for debugging |
 
 ## Priority Levels
 
@@ -43,7 +43,7 @@ if battery_soc < 40:
 # Market-driven decision
 if sell_price > (low_buy_price + 8):
     action = decisions.reason('export', 'lots of SOC, good sun and better buys coming', 
-                            values={'sell_price': sell_price, 'low_buy_price': low_buy_price})
+                              sell_price=sell_price, low_buy_price=low_buy_price)
 ```
 
 ### Priority-Based Decisions
@@ -69,16 +69,16 @@ if 14 < current_hour < 16 and battery_soc < 60:
     if buy_forecast and buy_price > min(buy_forecast[:6]):
         # Decision made but action not changed
         decisions.reason('auto', 'waiting for lower buy price soon', 
-                        values={'current_buy': buy_price, 'min_upcoming': min(buy_forecast[:6])})
+                         current_buy=buy_price, 'min_upcoming=min(buy_forecast[:6]))
     else:
         # Decision applied
         action = decisions.reason('import', 'panic buy - low SOC before evening', priority=3,
-                                values={'soc': battery_soc, 'buy_price': buy_price})
+                                  soc=battery_soc, buy_price=buy_price)
 ```
 
 ## Getting the Reason String
 
-At the end of your script, get the formatted reason displayed on the actions page with automatical visual indicators for each decision:
+At the end of your script, get the formatted reason displayed on the actions page with automatic visual indicators for each decision:
 
 This generates a visual summary like:
 ```
@@ -109,7 +109,7 @@ action = decisions.reason('import', 'buy now')
 ### 3. Include Key Values
 ```python
 action = decisions.reason('export', 'arbitrage opportunity detected', 
-                        values={'sell': sell_price, 'future_buy': min_buy_price, 'margin': margin})
+                          sell=sell_price, future_buy=min_buy_price, margin=margin)
 ```
 
 ### 4. Use Appropriate Priorities
@@ -128,7 +128,7 @@ if good_arbitrage_opportunity:
 if buy_forecast and buy_price > min(buy_forecast[:6]):
     # Log why we're NOT changing action
     decisions.reason('auto', 'waiting for better buy price', 
-                    values={'current': buy_price, 'upcoming_min': min(buy_forecast[:6])})
+                     current=buy_price, upcoming_min=min(buy_forecast[:6]))
 else:
     action = decisions.reason('import', 'good buy price available')
 ```
@@ -152,11 +152,11 @@ action = decisions.reason('auto', f'starting state @ {battery_soc}%', priority=1
 
 if rrp > 990:
     action = decisions.reason('export', 'high wholesale prices', priority=3, 
-                            values={'rrp': rrp})
+                              rrp=rrp)
 
 if battery_soc < min_soc:
     action = decisions.reason('auto', 'battery protection', priority=5,
-                            values={'soc': battery_soc, 'min_soc': min_soc})
+                              soc=battery_soc, min_soc=min_soc)
 
 reason = decisions.get_reason()
 ```
