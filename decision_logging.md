@@ -157,8 +157,8 @@ if rrp > 990:
 if battery_soc < min_soc:
     action = decisions.reason('auto', 'battery protection', priority=5,
                               soc=battery_soc, min_soc=min_soc)
-
-reason = decisions.get_reason()
 ```
+
+The reason string can now be left empty.
 
 The new approach provides better debugging, clearer decision flow, and automatic priority handling while maintaining compatibility with Powston's existing reason field.
