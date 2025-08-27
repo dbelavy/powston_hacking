@@ -202,17 +202,18 @@ house_kW = int(abs(house_power) // 1000) + 1
 
 # Solar control logic
 if buy_price < 0:
-    action = 'curtail100-curtail'  # Full curtailment during negative prices
+    feed_in_power_limitation = 0
+    action = 'auto'  # Full curtailment during negative prices
 elif sell_price > 0:
-    action = 'export-export'       # Maximum export when profitable
+    action = 'export'       # Maximum export when profitable
 elif battery_soc <= 95:
-    action = 'export-export'       # Fill battery when not full
+    action = 'export'       # Fill battery when not full
 elif battery_soc > 95 and sell_price < 0:
     if house_kW > 9:
-        action = 'export-export'   # High consumption needs full power
+        action = 'export'   # High consumption needs full power
     else:
-        curtail_level = max(1, min(9, house_kW))
-        action = f'curtail{curtail_level}000-curtail'
+        feed_in_power_limitation = max(1, min(9, house_kW))
+        action = f'curtail{feed_in_power_limitation}000-curtail'
 ```
 
 ### Amber Support
@@ -272,6 +273,7 @@ PRICE_RATIO_THRESHOLD = 1.5
 
 # Price-based decisions
 if buy_price < 0:
+    feed_in_power_limitation = 0
     action = 'import'
 elif sell_price > (avg_future_buy * PRICE_RATIO_THRESHOLD) and battery_soc > MIN_SOC:
     action = 'export'
@@ -281,14 +283,14 @@ elif sell_price > (avg_future_buy * PRICE_RATIO_THRESHOLD) and battery_soc > MIN
 ```python
 # Price-based solar control
 if buy_price < 0:
-    action = 'curtail100-curtail'
+    feed_in_power_limitation = 0
+    action = 'auto'
 elif sell_price > 0:
-    action = 'export-export'
-elif battery_soc <= 95:
-    action = 'export-export'
+    feed_in_power_limitation = None
+    action = 'export'
 else:
-    curtail_level = max(1, min(9, house_kW))
-    action = f'curtail{curtail_level}000-curtail'
+    feed_in_power_limitation = max(1, min(9, house_kW))
+    action = f'curtail{feed_in_power_limitation}000-curtail'
 ```
 ### Powston MQTT Integration
 
