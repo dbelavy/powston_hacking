@@ -37,10 +37,10 @@ Add this to your Powston ruleset:
 # OCPP hacking
 if action in ['auto', 'discharge', 'export']:
     mqtt_topic_ocpp_max_charge = 100
-    reason += f' EV limit {mqtt_topic_ocpp_max_charge}W'
+    action = decisions.reason(action, 'OCPP update', mqtt_topic_ocpp_max_charge=mqtt_topic_ocpp_max_charge)
 else:
     mqtt_topic_ocpp_max_charge = 7000
-    reason += f' EV limit {mqtt_topic_ocpp_max_charge}W'
+    action = decisions.reason(action, 'OCPP update', mqtt_topic_ocpp_max_charge=mqtt_topic_ocpp_max_charge)
 ```
 
 This snippet dynamically adjusts the charge rate:
